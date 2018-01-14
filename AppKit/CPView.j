@@ -129,7 +129,8 @@ var DOMElementPrototype         = nil,
     BackgroundVerticalThreePartImage    = 1,
     BackgroundHorizontalThreePartImage  = 2,
     BackgroundNinePartImage             = 3,
-    BackgroundTransparentColor          = 4;
+    BackgroundTransparentColor          = 4,
+    BackgroundCSSStyling                = 5;
 #endif
 
 var CPViewFlags                     = { },
@@ -195,6 +196,7 @@ var CPViewHighDPIDrawingEnabled = YES;
     CPArray             _DOMImageSizes;
 
     unsigned            _backgroundType;
+    CPArray             _cssStylePreviousState;
 #endif
 
     CGRect              _dirtyRect;
@@ -1954,15 +1956,29 @@ var CPViewHighDPIDrawingEnabled = YES;
     _backgroundColor = aColor;
 
 #if PLATFORM(DOM)
+    if (_backgroundType === BackgroundCSSStyling)
+    {
+        // Restore previous CSS styling before applying new background
+        
+        for (var i = 0; i < _cssStylePreviousState.length; i++)
+            _DOMElement.style[_cssStylePreviousState[i][0]] = _cssStylePreviousState[i][1];
+    }
+    
     var patternImage = [_backgroundColor patternImage],
         colorExists = _backgroundColor && ([_backgroundColor patternImage] || [_backgroundColor alphaComponent] > 0.0),
+        cssDictionary = [_backgroundColor cssDictionary],
         colorHasAlpha = colorExists && [_backgroundColor alphaComponent] < 1.0,
         supportsRGBA = CPFeatureIsCompatible(CPCSSRGBAFeature),
         colorNeedsDOMElement = colorHasAlpha && !supportsRGBA,
         amount = 0,
         slices;
 
-    if ([patternImage isThreePartImage])
+    if (cssDictionary)
+    {
+        _backgroundType = BackgroundCSSStyling;
+        amount = -_DOMImageParts.length;
+    }
+    else if ([patternImage isThreePartImage])
     {
         _backgroundType = [patternImage isVertical] ? BackgroundVerticalThreePartImage : BackgroundHorizontalThreePartImage;
         amount = 3;
@@ -2025,7 +2041,20 @@ var CPViewHighDPIDrawingEnabled = YES;
             _DOMElement.removeChild(_DOMImageParts.pop());
     }
 
-    if (_backgroundType === BackgroundTrivialColor || _backgroundType === BackgroundTransparentColor)
+    if (_backgroundType === BackgroundCSSStyling)
+    {
+        _DOMElement.style.background = "";
+        
+        _cssStylePreviousState = @[];
+        
+        [cssDictionary enumerateKeysAndObjectsUsingBlock:function(aKey, anObject, stop)
+         {
+             [_cssStylePreviousState addObject:@[aKey, _DOMElement.style[aKey]]];
+             
+             _DOMElement.style[aKey] = anObject;
+         }];
+    }
+    else if (_backgroundType === BackgroundTrivialColor || _backgroundType === BackgroundTransparentColor)
     {
         var colorCSS = colorExists ? [_backgroundColor cssString] : "";
 

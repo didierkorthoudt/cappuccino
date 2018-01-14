@@ -86,6 +86,8 @@ var cachedBlackColor,
 
     CPImage     _patternImage;
     CPString    _cssString;
+    
+    CPDictionary    _cssDictionary;
 }
 
 
@@ -914,6 +916,47 @@ var CPColorComponentsKey    = @"CPColorComponentsKey",
 }
 
 @end
+
+#pragma mark -
+#pragma mark CSS Theming
+
+@implementation CPColor (CSSTheming)
+
++ (CPColor)colorWithCSSDictionary:(CPDictionary)aDictionary
+{
+    return [[CPColor alloc] _initWithDictionary:aDictionary];
+}
+    
+- (id)_initWithDictionary:(CPDictionary)aDictionary
+{
+    self = [super init];
+    
+    if (self)
+    {
+        _cssDictionary = aDictionary;
+        _components    = [0.0, 0.0, 0.0, 1.0];
+        
+        _theme = [CPTheme defaultTheme];
+        _themeState = CPThemeStateNormal;
+        [self _loadThemeAttributes];
+    }
+     
+    return self;
+}
+
+- (CPDictionary)cssDictionary
+{
+    return _cssDictionary;
+}
+
+- (void)setCssDictionary:(CPDictionary)aDictionary
+{
+    _cssDictionary = aDictionary;
+}
+
+@end
+
+#pragma mark -
 
 
 /// @cond IGNORE
