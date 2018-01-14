@@ -52,10 +52,11 @@ CPCircularSlider    = 1;
 + (CPDictionary)themeAttributes
 {
     return @{
-            @"knob-color": [CPNull null],
-            @"knob-size": CGSizeMakeZero(),
-            @"track-width": 0.0,
-            @"track-color": [CPNull null],
+             @"left-track-color": [CPNull null],
+             @"knob-color": [CPNull null],
+             @"knob-size": CGSizeMakeZero(),
+             @"track-width": 0.0,
+             @"track-color": [CPNull null]
         };
 }
 
@@ -179,6 +180,60 @@ CPCircularSlider    = 1;
     return bounds;
 }
 
+- (CGRect)leftTrackRectForBounds:(CGRect)bounds
+{
+    // Circular slider do not have left and right parts, so we don't need to deal with them
+
+    var trackWidth   = [self currentValueForThemeAttribute:@"track-width"],
+        currentValue = [self doubleValue];
+    
+    if (trackWidth <= 0)
+        return CGRectMakeZero();
+    
+    if ([self isVertical])
+    {
+        bounds.origin.x = (bounds.size.width - trackWidth) / 2.0;
+        bounds.size.width = trackWidth;
+        bounds.size.height = ((_maxValue - currentValue) / (_maxValue - _minValue)) * bounds.size.height;
+    }
+    else
+    {
+        bounds.origin.y = (bounds.size.height - trackWidth) / 2.0;
+        bounds.size.width = ((currentValue - _minValue) / (_maxValue - _minValue)) * bounds.size.width;
+        bounds.size.height = trackWidth;
+    }
+    
+    return bounds;
+}
+
+- (CGRect)rightTrackRectForBounds:(CGRect)bounds
+{
+    // Circular slider do not have left and right parts, so we don't need to deal with them
+    
+    var trackWidth   = [self currentValueForThemeAttribute:@"track-width"],
+        currentValue = [self doubleValue];
+    
+    if (trackWidth <= 0)
+        return CGRectMakeZero();
+    
+    if ([self isVertical])
+    {
+        bounds.origin.x = (bounds.size.width - trackWidth) / 2.0;
+        bounds.origin.y = ((_maxValue - currentValue) / (_maxValue - _minValue)) * bounds.size.height;
+        bounds.size.width = trackWidth;
+        bounds.size.height = ((currentValue - _minValue) / (_maxValue - _minValue)) * bounds.size.height;
+    }
+    else
+    {
+        bounds.origin.x = ((currentValue - _minValue) / (_maxValue - _minValue)) * bounds.size.width;
+        bounds.origin.y = (bounds.size.height - trackWidth) / 2.0;
+        bounds.size.width = ((_maxValue - currentValue) / (_maxValue - _minValue)) * bounds.size.width;
+        bounds.size.height = trackWidth;
+    }
+    
+    return bounds;
+}
+
 - (CGRect)knobRectForBounds:(CGRect)bounds
 {
     var knobSize = [self currentValueForThemeAttribute:@"knob-size"];
@@ -222,13 +277,19 @@ CPCircularSlider    = 1;
 
     else if (aName === "knob-view")
         return [self knobRectForBounds:[self bounds]];
+    
+    else if (aName === "left-track-view")
+        return [self leftTrackRectForBounds:[self bounds]];
+    
+    else if (aName === "right-track-view")
+        return [self rightTrackRectForBounds:[self bounds]];
 
     return [super rectForEphemeralSubviewNamed:aName];
 }
 
 - (CPView)createEphemeralSubviewNamed:(CPString)aName
 {
-    if (aName === "track-view" || aName === "knob-view")
+    if (aName === "track-view" || aName === "knob-view" || aName === "left-track-view" || aName === "right-track-view")
     {
         var view = [[CPView alloc] init];
 
@@ -278,19 +339,44 @@ CPCircularSlider    = 1;
 
 - (void)layoutSubviews
 {
-    var trackView = [self layoutEphemeralSubviewNamed:@"track-view"
-                                           positioned:CPWindowBelow
-                      relativeToEphemeralSubviewNamed:@"knob-view"];
+    var leftTrackColor = [self currentValueForThemeAttribute:@"left-track-color"];
+    
+    if (leftTrackColor)
+    {
+        // Two parts layout (needed by Aristo3)
+        var leftTrackView = [self layoutEphemeralSubviewNamed:@"left-track-view"
+                                                   positioned:CPWindowBelow
+                              relativeToEphemeralSubviewNamed:@"knob-view"],
+            rightTrackView = [self layoutEphemeralSubviewNamed:@"right-track-view"
+                                                    positioned:CPWindowBelow
+                               relativeToEphemeralSubviewNamed:@"knob-view"];
+        
+        [leftTrackView  setBackgroundColor:leftTrackColor];
+        [rightTrackView setBackgroundColor:[self currentValueForThemeAttribute:@"track-color"]];
 
-    if (trackView)
-        [trackView setBackgroundColor:[self currentValueForThemeAttribute:@"track-color"]];
-
-    var knobView = [self layoutEphemeralSubviewNamed:@"knob-view"
-                                          positioned:CPWindowAbove
-                     relativeToEphemeralSubviewNamed:@"track-view"];
-
-    if (knobView)
+        var knobView = [self layoutEphemeralSubviewNamed:@"knob-view"
+                                              positioned:CPWindowAbove
+                         relativeToEphemeralSubviewNamed:@"left-track-view"];
+        
         [knobView setBackgroundColor:[self currentValueForThemeAttribute:"knob-color"]];
+    }
+    else
+    {
+        // Normal layout
+        var trackView = [self layoutEphemeralSubviewNamed:@"track-view"
+                                               positioned:CPWindowBelow
+                          relativeToEphemeralSubviewNamed:@"knob-view"];
+        
+        if (trackView)
+            [trackView setBackgroundColor:[self currentValueForThemeAttribute:@"track-color"]];
+
+        var knobView = [self layoutEphemeralSubviewNamed:@"knob-view"
+                                              positioned:CPWindowAbove
+                         relativeToEphemeralSubviewNamed:@"track-view"];
+        
+        if (knobView)
+            [knobView setBackgroundColor:[self currentValueForThemeAttribute:"knob-color"]];
+    }
 }
 
 - (BOOL)tracksMouseOutsideOfFrame
