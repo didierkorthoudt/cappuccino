@@ -55,6 +55,7 @@ CPCircularSlider    = 1;
              @"left-track-color": [CPNull null],
              @"knob-color": [CPNull null],
              @"knob-size": CGSizeMakeZero(),
+             @"knob-offset": 0.0,
              @"track-width": 0.0,
              @"track-color": [CPNull null]
         };
@@ -251,8 +252,9 @@ CPCircularSlider    = 1;
     if ([self hasThemeState:CPThemeStateCircular])
     {
         var angle = 3 * PI_2 - (1.0 - [self doubleValue] - _minValue) / (_maxValue - _minValue) * PI2,
-            radius = CGRectGetWidth(trackRect) / 2.0 - 8.0;
-
+            knobOffset = [self currentValueForThemeAttribute:@"knob-offset"],
+            radius = CGRectGetWidth(trackRect) / 2.0 - (knobOffset ? knobOffset : 8.0);
+        
         knobRect.origin.x = radius * COS(angle) + CGRectGetMidX(trackRect) - 3.0;
         knobRect.origin.y = radius * SIN(angle) + CGRectGetMidY(trackRect) - 2.0;
     }
