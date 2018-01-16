@@ -533,6 +533,43 @@ function CPAppKitImage(aFilename, aSize)
 
 @end
 
+@implementation CPImage (CSSStyling)
+{
+    CPDictionary    _cssDictionary;
+}
+
++ (CPImage)imageWithCSSDictionary:(CPDictionary)aDictionary size:(CGSize)aSize
+{
+    return [[CPImage alloc] initWithCSSDictionary:aDictionary size:aSize]; 
+}
+
+- (id)initWithCSSDictionary:(CPDictionary)aDictionary size:(CGSize)aSize
+{
+    self = [super init];
+    
+    if (self)
+    {
+        _size = CGSizeMakeCopy(aSize);
+        _filename = @"CSS image";
+        _loadStatus = CPImageLoadStatusCompleted;
+        _cssDictionary = aDictionary;
+    }
+    
+    return self;
+}
+
+- (CPDictionary)cssDictionary
+{
+    return _cssDictionary;
+}
+
+- (void)setCssDictionary:(CPDictionary)aDictionary
+{
+    _cssDictionary = aDictionary;
+}
+
+@end
+
 @implementation CPThreePartImage : CPObject
 {
     CPArray _imageSlices;

@@ -589,43 +589,53 @@ var _CPimageAndTextViewFrameSizeChangedFlag         = 1 << 0,
             }
         }
     }
-
+    
     var needsDOMImageElement = _image !== nil && _imagePosition !== CPNoImage,
-        hasDOMImageElement = !!_DOMImageElement;
-
-    // Create or destroy DOM Image element
-    if (needsDOMImageElement !== hasDOMImageElement)
+        hasDOMImageElement = !!_DOMImageElement,
+        // For CSS theming
+        imageCssDictionary = [_image respondsToSelector:@selector(cssDictionary)] ? [_image cssDictionary] : nil,
+        isIMGImageElement = hasDOMImageElement && _DOMImageElement.hasAttribute("src");
+    
+    // First, check if we need to destroy a current DOM image element. This is the case if :
+    // - we have one but don't need it anymore
+    // - we have one but not the right one (that is a DIV but needing an IMG, and vice versa)
+    
+    if (hasDOMImageElement)
     {
-        if (hasDOMImageElement)
+        if (!needsDOMImageElement || (isIMGImageElement && imageCssDictionary) || (!isIMGImageElement && !imageCssDictionary))
         {
+            // OK, destroy it
+
             _DOMElement.removeChild(_DOMImageElement);
-
+            
             _DOMImageElement = nil;
-
+            
             hasDOMImageElement = NO;
         }
-
-        else
+    }
+    
+    // Now, if we need a DOM image element and if we don't have one, create a new one
+    
+    if (needsDOMImageElement && !hasDOMImageElement)
+    {
+        _DOMImageElement = document.createElement(imageCssDictionary ? "div" : "img");
+        
+        if ([CPPlatform supportsDragAndDrop])
         {
-            _DOMImageElement = document.createElement("img");
-
-            if ([CPPlatform supportsDragAndDrop])
-            {
-                _DOMImageElement.setAttribute("draggable", "true");
-                _DOMImageElement.style["-khtml-user-drag"] = "element";
-            }
-
-            var imageStyle = _DOMImageElement.style;
-
-            imageStyle.top = "0px";
-            imageStyle.left = "0px";
-            imageStyle.position = "absolute";
-            imageStyle.zIndex = 100;
-
-            _DOMElement.appendChild(_DOMImageElement);
-
-            hasDOMImageElement = YES;
+            _DOMImageElement.setAttribute("draggable", "true");
+            _DOMImageElement.style["-khtml-user-drag"] = "element";
         }
+        
+        var imageStyle = _DOMImageElement.style;
+        
+        imageStyle.top = "0px";
+        imageStyle.left = "0px";
+        imageStyle.position = "absolute";
+        imageStyle.zIndex = 100;
+        
+        _DOMElement.appendChild(_DOMImageElement);
+        
+        hasDOMImageElement = YES;
     }
 
     var size = [self bounds].size,
@@ -637,7 +647,15 @@ var _CPimageAndTextViewFrameSizeChangedFlag         = 1 << 0,
             var imageStyle = _DOMImageElement.style;
 
         if (_flags & _CPImageAndTextViewImageChangedFlag)
-            _DOMImageElement.src = [_image filename];
+            if (imageCssDictionary)
+            {
+                [imageCssDictionary enumerateKeysAndObjectsUsingBlock:function(aKey, anObject, stop)
+                 {
+                     _DOMImageElement.style[aKey] = anObject;
+                 }];
+            }
+            else
+                _DOMImageElement.src = [_image filename];
 
         var centerX = size.width / 2.0,
             centerY = size.height / 2.0,
