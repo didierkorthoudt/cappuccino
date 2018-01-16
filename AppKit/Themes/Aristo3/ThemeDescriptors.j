@@ -387,19 +387,45 @@ var themedButtonValues = nil,
                              orientation: PatternIsHorizontal
                              }),
     
+    buttonCssColor = [CPColor colorWithCSSDictionary:@{
+                                                       @"border-color": @"rgb(213,213,213)",
+                                                       @"border-style": @"solid",
+                                                       @"border-width": @"1px",
+                                                       @"border-radius": @"3px",
+                                                       @"box-sizing": @"border-box"
+                                                       }],
+    
+    disabledButtonCssColor = [CPColor colorWithCSSDictionary:@{
+                                                               @"border-color": @"rgb(230,230,230)",
+                                                               @"border-style": @"solid",
+                                                               @"border-width": @"1px",
+                                                               @"border-radius": @"3px",
+                                                               @"box-sizing": @"border-box"
+                                                               }],
+    
+    highlightedButtonCssColor = [CPColor colorWithCSSDictionary:@{
+                                                                  @"border-color": @"rgb(205,205,205)",
+                                                                  @"border-style": @"solid",
+                                                                  @"border-width": @"1px",
+                                                                  @"border-radius": @"3px",
+                                                                  @"box-sizing": @"border-box",
+                                                                  @"background-color": @"rgb(231,231,231)"
+                                                                  }],
+    
     themeValues =
     [
      // CPThemeStateControlSizeRegular
-     [@"bezel-color",                regularColor["@"],                      CPThemeStateBordered],
-     [@"bezel-color",                regularColor["disabled"],               [CPThemeStateBordered, CPThemeStateDisabled]],
+     [@"bezel-color",                buttonCssColor,                      CPThemeStateBordered],
+     [@"bezel-color",                highlightedButtonCssColor,               [CPThemeStateBordered, CPThemeStateHighlighted]],
+     [@"bezel-color",                disabledButtonCssColor,               [CPThemeStateBordered, CPThemeStateDisabled]],
      
      [@"content-inset",              CGInsetMake(0, 22.0 + 5.0, 0, 5.0),     CPThemeStateBordered],
-     [@"font",                       [CPFont boldSystemFontOfSize:12.0]],
+     [@"font",                       [CPFont systemFontOfSize:12.0]],
      [@"text-color",                 regularTextColor],
-     [@"text-shadow-color",          regularTextShadowColor],
+//     [@"text-shadow-color",          regularTextShadowColor],
      
      [@"text-color",                 regularDisabledTextColor,               [CPThemeStateBordered, CPThemeStateDisabled]],
-     [@"text-shadow-color",          regularDisabledTextShadowColor,         [CPThemeStateBordered, CPThemeStateDisabled]],
+//     [@"text-shadow-color",          regularDisabledTextShadowColor,         [CPThemeStateBordered, CPThemeStateDisabled]],
      
      [@"min-size",                   CGSizeMake(32.0, 25.0)],
      [@"max-size",                   CGSizeMake(-1.0, 25.0)],
@@ -1535,15 +1561,87 @@ var themedButtonValues = nil,
     return button;
 }
 
+/* $$$$$$$$$
+ 
+- (CPDictionary)makeCSSDictionaryForPosition:(CGPoint)aPoint
+{
+    var cssDictionary = @{ @"background-repeat": @"no-repeat"; };
+    
+    if (screenIsHiRes)
+    {
+        
+    }
+    else
+    {
+        
+    }
+    
+    return cssDictionary;
+}
+var query = "(-webkit-min-device-pixel-ratio: 2), (min-device-pixel-ratio: 2), (min-resolution: 192dpi)";
+
+if (window.matchMedia(query).matches) {
+    divElement.innerText = "High-DPI / Retina!";
+} else {
+    divElement.innerText = "NOT High DPI / Retina!";
+}
+*/
+
+
 + (CPCheckBox)themedCheckBoxButton
 {
     var button = [CPCheckBox checkBoxWithTitle:@"Checkbox"],
-    regularImageNormal = PatternImage("check-box-image.png", 21.0, 21.0),
-    regularImageSelected = PatternImage("check-box-image-selected.png", 21.0, 21.0),
-    regularImageSelectedHighlighted = PatternImage("check-box-image-selected-highlighted.png", 21.0, 21.0),
-    regularImageSelectedDisabled = PatternImage("check-box-image-selected.png", 21.0, 21.0),
-    regularImageDisabled = PatternImage("check-box-image.png", 21.0, 21.0),
-    regularImageHighlighted = PatternImage("check-box-image-highlighted.png", 21.0, 21.0),
+    
+    // FIXME: refaire les couleurs des disabled (trop léger)
+    // FIXME: vérifier le comportement sur définition simple
+    
+    regularImageNormal = [CPImage imageWithCSSDictionary:@{
+                                                           @"background-image": @"url(Resources/packed.png)",
+                                                           @"background-position": @"-16px 0px",    // -32px 0px
+                                                           @"background-repeat": @"no-repeat",
+                                                           @"background-size": @"100px 400px"       // 200px 800px
+                                                           }
+                                                    size:CGSizeMake(16,16)],
+    
+    regularImageSelected = [CPImage imageWithCSSDictionary:@{
+                                                             @"background-image": @"url(Resources/packed.png)",
+                                                             @"background-position": @"0px 0px",    // 0px 0px
+                                                             @"background-repeat": @"no-repeat",
+                                                             @"background-size": @"100px 400px"     // 200px 800px
+                                                             }
+                                                      size:CGSizeMake(16,16)],
+    
+    regularImageSelectedHighlighted = [CPImage imageWithCSSDictionary:@{
+                                                                        @"background-image": @"url(Resources/packed.png)",
+                                                                        @"background-position": @"-64px 0px",  // -128px 0px
+                                                                        @"background-repeat": @"no-repeat",
+                                                                        @"background-size": @"100px 400px"      // 200px 800px
+                                                                        }
+                                                                 size:CGSizeMake(16,16)],
+    
+    regularImageHighlighted = [CPImage imageWithCSSDictionary:@{
+                                                                @"background-image": @"url(Resources/packed.png)",
+                                                                @"background-position": @"-48px 0px",       // -96px 0px
+                                                                @"background-repeat": @"no-repeat",
+                                                                @"background-size": @"100px 400px"          // 200px 800px
+                                                                }
+                                                         size:CGSizeMake(16,16)],
+    
+    regularImageDisabled = [CPImage imageWithCSSDictionary:@{
+                                                             @"background-image": @"url(Resources/packed.png)",
+                                                             @"background-position": @"-16px -16px",    // -32px -32px  !!!
+                                                             @"background-repeat": @"no-repeat",
+                                                             @"background-size": @"100px 400px"       // 200px 800px
+                                                             }
+                                                      size:CGSizeMake(16,16)],
+    
+    regularImageSelectedDisabled = [CPImage imageWithCSSDictionary:@{
+                                                                     @"background-image": @"url(Resources/packed.png)",
+                                                                     @"background-position": @"0px -16px",    // 0px -32px  !!!
+                                                                     @"background-repeat": @"no-repeat",
+                                                                     @"background-size": @"100px 400px"     // 200px 800px
+                                                                     }
+                                                              size:CGSizeMake(16,16)],
     
     smallImageNormal = PatternImage("check-box-image.png", 19.0, 19.0),
     smallImageSelected = PatternImage("check-box-image-selected.png", 19.0, 19.0),
@@ -1580,7 +1678,7 @@ var themedButtonValues = nil,
      [@"image",                      regularImageDisabled,                               CPThemeStateDisabled],
      [@"image",                      regularImageSelectedDisabled,                       [CPThemeStateSelected, CPThemeStateDisabled]],
      
-     [@"min-size",                   CGSizeMake(21.0, 21.0)],
+     [@"min-size",                   CGSizeMake(16.0, 16.0)],
      [@"max-size",                   CGSizeMake(-1.0, -1.0)],
      [@"nib2cib-adjustment-frame",   CGRectMake(-1.0, 2.0, 10.0, 0.0)],
      
@@ -1592,7 +1690,7 @@ var themedButtonValues = nil,
      [@"image",                      smallImageDisabled,                                 [CPThemeStateControlSizeSmall, CPThemeStateDisabled]],
      [@"image",                      smallImageSelectedDisabled,                         [CPThemeStateControlSizeSmall, CPThemeStateSelected, CPThemeStateDisabled]],
      
-     [@"min-size",                   CGSizeMake(19.0, 19.0),                             CPThemeStateControlSizeSmall],
+     [@"min-size",                   CGSizeMake(14.0, 14.0),                             CPThemeStateControlSizeSmall],
      [@"max-size",                   CGSizeMake(-1.0, -1.0),                             CPThemeStateControlSizeSmall],
      [@"nib2cib-adjustment-frame",   CGRectMake(1.0, 1.0, 0.0, 0.0),                     CPThemeStateControlSizeSmall],
      
@@ -1604,12 +1702,12 @@ var themedButtonValues = nil,
      [@"image",                      miniImageDisabled,                                  [CPThemeStateControlSizeMini, CPThemeStateDisabled]],
      [@"image",                      miniImageSelectedDisabled,                          [CPThemeStateControlSizeMini, CPThemeStateSelected, CPThemeStateDisabled]],
      
-     [@"min-size",                   CGSizeMake(16.0, 16.0),                             CPThemeStateControlSizeMini],
+     [@"min-size",                   CGSizeMake(12.0, 12.0),                             CPThemeStateControlSizeMini],
      [@"max-size",                   CGSizeMake(-1.0, -1.0),                             CPThemeStateControlSizeMini],
      [@"nib2cib-adjustment-frame",   CGRectMake(2.0, 0.0, 0.0, 0.0),                     CPThemeStateControlSizeMini]
      ];
     
-    [button setThemeState:CPThemeStateSelected];
+    [button setThemeState:CPThemeStateNormal];
     
     [self registerThemeValues:themedCheckBoxValues forView:button];
     
@@ -1623,9 +1721,33 @@ var themedButtonValues = nil,
     [button setAllowsMixedState:YES];
     [button setState:CPMixedState];
     
-    var mixedHighlightedImage = PatternImage("check-box-image-mixed-highlighted.png", 21.0, 21.0),
-    mixedDisabledImage = PatternImage("check-box-image-mixed.png", 21.0, 21.0),
-    mixedImage = PatternImage("check-box-image-mixed.png", 21.0, 21.0),
+//    var mixedHighlightedImage = PatternImage("check-box-image-mixed-highlighted.png", 21.0, 21.0),
+//    mixedDisabledImage = PatternImage("check-box-image-mixed.png", 21.0, 21.0),
+//    mixedImage = PatternImage("check-box-image-mixed.png", 21.0, 21.0),
+    
+    var mixedHighlightedImage = [CPImage imageWithCSSDictionary:@{
+                                                                  @"background-image": @"url(Resources/packed.png)",
+                                                                  @"background-position": @"-80px 0px",    // -160px 0px
+                                                                  @"background-repeat": @"no-repeat",
+                                                                  @"background-size": @"100px 400px"       // 200px 800px
+                                                                  }
+                                                           size:CGSizeMake(16,16)],
+    
+    mixedDisabledImage = [CPImage imageWithCSSDictionary:@{
+                                                           @"background-image": @"url(Resources/packed.png)",
+                                                           @"background-position": @"-32px -16px",    // -64px -32px
+                                                           @"background-repeat": @"no-repeat",
+                                                           @"background-size": @"100px 400px"     // 200px 800px
+                                                           }
+                                                    size:CGSizeMake(16,16)],
+    
+    mixedImage = [CPImage imageWithCSSDictionary:@{
+                                                   @"background-image": @"url(Resources/packed.png)",
+                                                   @"background-position": @"-32px 0px",  // -64px 0px
+                                                   @"background-repeat": @"no-repeat",
+                                                   @"background-size": @"100px 400px"      // 200px 800px
+                                                   }
+                                            size:CGSizeMake(16,16)],
     
     themeValues =
     [
@@ -2007,7 +2129,7 @@ var themedButtonValues = nil,
 
 + (CPSlider)makeCircularSlider
 {
-    var slider = [[CPSlider alloc] initWithFrame:CGRectMake(0.0, 0.0, 30.0, 30.0)];
+    var slider = [[CPSlider alloc] initWithFrame:CGRectMake(0.0, 0.0, 24.0, 24.0)];
     
     [slider setSliderType:CPCircularSlider];
     
@@ -2018,21 +2140,68 @@ var themedButtonValues = nil,
 {
     var slider = [self makeCircularSlider],
     
-    trackColor = PatternColor("slider-circular-bezel.png", 30.0, 30.0),
-    trackDisabledColor = PatternColor("slider-circular-disabled-bezel.png", 30.0, 30.0),
-    knobColor = PatternColor("slider-circular-knob.png", 5.0, 5.0),
-    knobDisabledColor = PatternColor("slider-circular-disabled-knob.png", 5.0, 5.0),
-    knobHighlightedColor = knobColor;
+    // FIXME: faire les disabled
+    
+    knobCssColor = [CPColor colorWithCSSDictionary:@{
+                                                     @"border-color": @"rgb(159,159,159)",
+                                                     @"border-style": @"solid",
+                                                     @"border-width": @"1px",
+                                                     @"border-radius": @"50%",
+                                                     @"box-sizing": @"border-box",
+                                                     @"background-color": @"rgb(231,231,231)"
+                                                     }],
+    
+    disabledKnobCssColor = [CPColor colorWithCSSDictionary:@{
+                                                             @"border-color": @"rgb(230,230,230)",
+                                                             @"border-style": @"solid",
+                                                             @"border-width": @"1px",
+                                                             @"border-radius": @"50%",
+                                                             @"box-sizing": @"border-box",
+                                                             @"background-color": @"rgb(250,250,250)"
+                                                             }],
+    
+    highlightedKnobCssColor = [CPColor colorWithCSSDictionary:@{
+                                                                @"border-color": @"rgb(151,151,151)",
+                                                                @"border-style": @"solid",
+                                                                @"border-width": @"1px",
+                                                                @"border-radius": @"50%",
+                                                                @"box-sizing": @"border-box",
+                                                                @"background-color": @"rgb(231,231,231)"
+                                                                }],
+    
+    trackCssColor = [CPColor colorWithCSSDictionary:@{
+                                                      @"border-color": @"rgb(213,213,213)",
+                                                      @"border-style": @"solid",
+                                                      @"border-width": @"1px",
+                                                      @"border-radius": @"50%",
+                                                      @"box-sizing": @"border-box",
+                                                      @"background-color": @"rgb(250,250,250)"
+                                                      }],
+    
+    disabledTrackCssColor = [CPColor colorWithCSSDictionary:@{
+                                                              @"background-color": @"rgb(230,230,230)"
+                                                              }],
+    
+    highlightedTrackCssColor = [CPColor colorWithCSSDictionary:@{
+                                                                 @"border-color": @"rgb(205,205,205)",
+                                                                 @"border-style": @"solid",
+                                                                 @"border-width": @"1px",
+                                                                 @"border-radius": @"50%",
+                                                                 @"box-sizing": @"border-box",
+                                                                 @"background-color": @"rgb(231,231,231)"
+                                                              }],
     
     themedCircularSliderValues =
     [
-     [@"track-color", trackColor,            CPThemeStateCircular],
-     [@"track-color", trackDisabledColor,    [CPThemeStateCircular, CPThemeStateDisabled]],
+     [@"track-color",   trackCssColor,                  CPThemeStateCircular],
+     [@"track-color",   disabledTrackCssColor,          [CPThemeStateCircular, CPThemeStateDisabled]],
+     [@"track-color",   highlightedTrackCssColor,       [CPThemeStateCircular, CPThemeStateHighlighted]],
      
-     [@"knob-size",  CGSizeMake(5.0, 5.0),   CPThemeStateCircular],
-     [@"knob-color", knobColor,              CPThemeStateCircular],
-     [@"knob-color", knobHighlightedColor,   [CPThemeStateCircular, CPThemeStateHighlighted]],
-     [@"knob-color", knobDisabledColor,      [CPThemeStateCircular, CPThemeStateDisabled]]
+     [@"knob-size",     CGSizeMake(4.0, 4.0),           CPThemeStateCircular],
+     [@"knob-offset",   6.0,                            CPThemeStateCircular],
+     [@"knob-color",    knobCssColor,                   CPThemeStateCircular],
+     [@"knob-color",    highlightedKnobCssColor,        [CPThemeStateCircular, CPThemeStateHighlighted]],
+     [@"knob-color",    disabledKnobCssColor,           [CPThemeStateCircular, CPThemeStateDisabled]]
      ];
     
     [self registerThemeValues:themedCircularSliderValues forView:slider];
