@@ -4,6 +4,7 @@
 
 @import <Foundation/CPTimer.j>
 @import <Foundation/CPRunLoop.j>
+@import <Foundation/CPGeometry.j>
 
 @typedef Map;
 
