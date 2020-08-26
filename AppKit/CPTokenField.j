@@ -1729,6 +1729,7 @@ var CPTokenFieldTokenizingCharacterSetKey   = "CPTokenFieldTokenizingCharacterSe
 
         [self _init];
 
+        [self updateTrackingAreas];
         [self setNeedsLayout];
         [self setNeedsDisplay:YES];
     }
