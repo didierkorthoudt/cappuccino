@@ -331,6 +331,7 @@ var CPToolbarsByIdentifier              = nil,
 
     // _defaultItems may have been loaded from Cib
     _itemIdentifiers = [_defaultItems valueForKey:@"itemIdentifier"] || [];
+    CPLog.trace("*** _itemIdentifiers="+_itemIdentifiers);
 
     if ([self _delegateRespondsToToolbarDefaultItemIdentifiers])
     {
@@ -378,6 +379,7 @@ var CPToolbarsByIdentifier              = nil,
     // items to be removed last at the front.
 
     _itemsSortedByVisibilityPriority = [_items sortedArrayUsingFunction:_CPToolbarItemVisibilityPriorityCompare context:NULL];
+    CPLog.trace("*** _itemsSortedByVisibilityPriority="+_itemsSortedByVisibilityPriority);
 
     [_toolbarView reloadToolbarItems];
 }
@@ -424,6 +426,7 @@ var CPToolbarsByIdentifier              = nil,
 {
     var toolbarItems = [self visibleItems],
         count = [toolbarItems count];
+    CPLog.trace("_validateVisibleItems:"+isAutovalidation+" count="+count);
 
     while (count--)
     {
@@ -572,6 +575,7 @@ var CPToolbarIdentifierKey              = @"CPToolbarIdentifierKey",
                      target:self
                    argument:nil
                       order:0 modes:[CPDefaultRunLoopMode]];
+//        [self _reloadToolbarItems];
     }
 
     return self;
@@ -981,6 +985,7 @@ var _CPToolbarItemInfoMake = function(anIndex, aView, aLabel, aMinWidth)
 
 - (void)layoutSubviews
 {
+//    [_toolbar validateVisibleItems];
     [_additionalItemsButton setAlternateImage:[self valueForThemeAttribute:@"extra-item-extra-alternate-image"]];
 }
 
@@ -1089,6 +1094,7 @@ var LABEL_MARGIN    = 2.0;
 
     [self setTarget:[_toolbarItem target]];
     [self setAction:[_toolbarItem action]];
+    CPLog.trace("§§§ updateFromItem:"+[_toolbarItem label]+" action="+[self action]+" target="+[self target]);
 
     var view = [_toolbarItem view] || nil;
 
@@ -1269,6 +1275,7 @@ var LABEL_MARGIN    = 2.0;
                         change:(CPDictionary)aChange
                        context:(id)aContext
 {
+    CPLog.trace("### observe keyPath="+aKeyPath+" target="+[anObject target]+" action="+[anObject action]);
     if (aKeyPath === "enabled")
         [self setEnabled:[anObject isEnabled]];
 
