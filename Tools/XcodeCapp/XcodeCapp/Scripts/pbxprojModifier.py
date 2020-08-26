@@ -60,6 +60,25 @@ class PBXModifier (object):
         if len(self.project.get_files_by_os_path(os.path.join(self.XCODE_SUPPORT_FOLDER, self.XCC_GENERAL_INCLUDE))) == 0:
             self.project.add_file(xcc_general_include_path, parent=self.shadowGroup)
 
+        # Copy the AppKit IB headers (Frameworks/Debug/AppKit/Resources/AppKit.IBHeaders) to the support folder (.XcodeSupport/AppKit.h)
+        appkit_headers_source_path = os.path.join(self.projectRootPath, u"Frameworks", u"Debug", u"AppKit", u"Resources", u"AppKit.IBHeaders")
+        appkit_headers_destination_path = os.path.join(self.projectRootPath, self.XCODE_SUPPORT_FOLDER, u"AppKit.h")
+
+        try:
+            fs = open(appkit_headers_source_path, "r")
+            fd = open(appkit_headers_destination_path, "w")
+            for line in fs:
+                fd.write(line)
+            fs.close()
+            fd.close()
+
+            # Add the AppKit.h to the project (into the "Cocoa Classes" group)
+            if len(self.project.get_files_by_os_path(os.path.join(self.XCODE_SUPPORT_FOLDER, u"AppKit.h"))) == 0:
+                self.project.add_file(appkit_headers_destination_path, parent=self.shadowGroup)
+
+        except (OSError, IOError) as e:
+            return None
+
     def file_with_path(self, projectSourcePath):
         relativePath = os.path.relpath(projectSourcePath, self.projectRootPath)
 
