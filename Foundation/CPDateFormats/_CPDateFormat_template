@@ -1,0 +1,27 @@
+// _CPDateFormat template
+//
+// Duplicate this file, name it _CPDateFormat_xx where xx is the language symbol (i.e. fr, en, de, ...) in ISO 639-1 Code
+// Don't forget to include it in _CPDateFormats
+// If you have to use accentuated characters, include them like : String.fromCharCode(xx) where xx is the decimal unicode value representing the character
+
+[self _setSymbols:@{
+                    @"AMSymbol" :                          @"AM",
+                    @"PMSymbol" :                          @"PM",
+                    @"weekdaySymbols" :                    @[@"Sunday", @"Monday", @"Tuesday", @"Wednesday", @"Thursday", @"Friday", @"Saturday"],
+                    @"shortWeekdaySymbols" :               @[@"Sun", @"Mon", @"Tue", @"Wed", @"Thu", @"Fri", @"Sat"],
+                    @"veryShortWeekdaySymbols" :           @[@"S", @"M", @"T", @"W", @"T", @"F", @"S"],
+                    @"standaloneWeekdaySymbols" :          @[@"Sunday", @"Monday", @"Tuesday", @"Wednesday", @"Thursday", @"Friday", @"Saturday"],
+                    @"shortStandaloneWeekdaySymbols" :     @[@"Sun", @"Mon", @"Tue", @"Wed", @"Thu", @"Fri", @"Sat"],
+                    @"veryShortStandaloneWeekdaySymbols" : @[@"S", @"M", @"T", @"W", @"T", @"F", @"S"],
+                    @"monthSymbols" :                      @[@"January", @"February", @"March", @"April", @"May", @"June", @"July", @"August", @"September", @"October", @"November", @"December"],
+                    @"shortMonthSymbols" :                 @[@"Jan", @"Feb", @"Mar", @"Apr", @"May", @"Jun", @"Jul", @"Aug", @"Sep", @"Oct", @"Nov", @"Dec"],
+                    @"veryShortMonthSymbols" :             @[@"J", @"F", @"M", @"A", @"M", @"J", @"J", @"A", @"S", @"O", @"N", @"D"],
+                    @"standaloneMonthSymbols" :            @[@"January", @"February", @"March", @"April", @"May", @"June", @"July", @"August", @"September", @"October", @"November", @"December"],
+                    @"shortStandaloneMonthSymbols" :       @[@"Jan", @"Feb", @"Mar", @"Apr", @"May", @"Jun", @"Jul", @"Aug", @"Sep", @"Oct", @"Nov", @"Dec"],
+                    @"veryShortStandaloneMonthSymbols" :   @[@"J", @"F", @"M", @"A", @"M", @"J", @"J", @"A", @"S", @"O", @"N", @"D"],
+                    @"quarterSymbols" :                    @[@"1st quarter", @"2nd quarter", @"3rd quarter", @"4th quarter"],
+                    @"shortQuarterSymbols" :               @[@"Q1", @"Q2", @"Q3", @"Q4"],
+                    @"standaloneQuarterSymbols" :          @[@"1st quarter", @"2nd quarter", @"3rd quarter", @"4th quarter"],
+                    @"shortStandaloneQuarterSymbols" :     @[@"Q1", @"Q2", @"Q3", @"Q4"]
+                    }
+  forLanguageCode:@"us"]; // Don't forget to set the supported language code

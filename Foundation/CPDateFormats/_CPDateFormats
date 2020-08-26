@@ -1,0 +1,6 @@
+// _CPDateFormats
+//
+// Include in this file the various supporting files by appending an @import at the end of the list
+
+#include "CPDateFormats/_CPDateFormat_en"
+#include "CPDateFormats/_CPDateFormat_fr"

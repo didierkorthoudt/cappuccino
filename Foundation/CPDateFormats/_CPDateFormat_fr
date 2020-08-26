@@ -1,0 +1,23 @@
+// _CPDateFormat fr
+CPLog.trace(">>>>>>>>>>>>>> _CPDateFormat fr");
+[self _setSymbols:@{
+                    @"AMSymbol" :                          @"AM",
+                    @"PMSymbol" :                          @"PM",
+                    @"weekdaySymbols" :                    @[@"dimanche", @"lundi", @"mardi", @"mercredi", @"jeudi", @"vendredi", @"samedi"],
+                    @"shortWeekdaySymbols" :               @[@"dim.", @"lun.", @"mar.", @"mer.", @"jeu.", @"ven.", @"sam."],
+                    @"veryShortWeekdaySymbols" :           @[@"Di", @"Lu", @"Ma", @"Me", @"Je", @"Ve", @"Sa"],
+                    @"standaloneWeekdaySymbols" :          @[@"dimanche", @"lundi", @"mardi", @"mercredi", @"jeudi", @"vendredi", @"samedi"],
+                    @"shortStandaloneWeekdaySymbols" :     @[@"dim.", @"lun.", @"mar.", @"mer.", @"jeu.", @"ven.", @"sam."],
+                    @"veryShortStandaloneWeekdaySymbols" : @[@"Di", @"Lu", @"Ma", @"Me", @"Je", @"Ve", @"Sa"],
+                    @"monthSymbols" :                      @[@"janvier", @"f"+String.fromCharCode(233)+"vrier", @"mars", @"avril", @"mai", @"juin", @"juillet", @"ao"+String.fromCharCode(251)+"t", @"septembre", @"octobre", @"novembre", @"d"+String.fromCharCode(233)+"cembre"],
+                    @"shortMonthSymbols" :                 @[@"janv.", @"f"+String.fromCharCode(233)+"vr.", @"mars", @"avr.", @"mai", @"juin", @"juil.", @"ao"+String.fromCharCode(251)+"t", @"sept.", @"oct.", @"nov.", @"d"+String.fromCharCode(233)+"c."],
+                    @"veryShortMonthSymbols" :             @[@"J", @"F", @"M", @"A", @"M", @"J", @"J", @"A", @"S", @"O", @"N", @"D"],
+                    @"standaloneMonthSymbols" :            @[@"janvier", @"f"+String.fromCharCode(233)+"vrier", @"mars", @"avril", @"mai", @"juin", @"juillet", @"ao"+String.fromCharCode(251)+"t", @"septembre", @"octobre", @"novembre", @"d"+String.fromCharCode(233)+"cembre"],
+                    @"shortStandaloneMonthSymbols" :       @[@"janv.", @"f"+String.fromCharCode(233)+"vr.", @"mars", @"avr.", @"mai", @"juin", @"juil.", @"ao"+String.fromCharCode(251)+"t", @"sept.", @"oct.", @"nov.", @"d"+String.fromCharCode(233)+"c."],
+                    @"veryShortStandaloneMonthSymbols" :   @[@"J", @"F", @"M", @"A", @"M", @"J", @"J", @"A", @"S", @"O", @"N", @"D"],
+                    @"quarterSymbols" :                    @[@"1er trimestre", @"2e trimestre", @"3e trimestre", @"4e trimestre"],
+                    @"shortQuarterSymbols" :               @[@"T1", @"T2", @"T3", @"T4"],
+                    @"standaloneQuarterSymbols" :          @[@"1er trimestre", @"2e trimestre", @"3e trimestre", @"4e trimestre"],
+                    @"shortStandaloneQuarterSymbols" :     @[@"T1", @"T2", @"T3", @"T4"]
+                    }
+  forLanguageCode:@"fr"];
