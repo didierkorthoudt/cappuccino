@@ -49,6 +49,8 @@ var CPThemesByName          = { },
 + (void)setDefaultTheme:(CPTheme)aTheme
 {
     CPThemeDefaultTheme = aTheme;
+
+    [CPFont initializeSystemFontFromTheme:aTheme];
 }
 
 + (CPTheme)defaultTheme
@@ -487,7 +489,7 @@ var _savedThemesByName = { };
 
               [[anObject2 values] enumerateKeysAndObjectsUsingBlock:function(aKey3, anObject3, stop3)
                {
-                   if (anObject3.isa && ([anObject3 isKindOfClass:CPImage] || [anObject3 isKindOfClass:CPColor]) && [anObject3 cssDictionary])
+                   if (anObject3.isa && ([anObject3 isKindOfClass:CPImage] || [anObject3 isKindOfClass:CPColor]) && [anObject3 isCSSBased])  // was cssDictionary
                    {
                        // We have a CSS defined image or color
                        [self _fixPathInCSSDictionary:[anObject3 cssDictionary]       withPathToResources:pathToResources];
@@ -505,6 +507,11 @@ var _savedThemesByName = { };
      {
          [aDictionary setObject:[anObject stringByReplacingOccurrencesOfString:@"%%" withString:pathToResources] forKey:aKey];
      }];
+}
+
+- (CPString)setCSSResourcesPathInString:(CPString)aString
+{
+    return [aString stringByReplacingOccurrencesOfString:@"%%" withString:[[[[CPApplication sharedApplication] themeBlend] bundle] resourcePath]];
 }
 
 - (void)applyDynamicSet:(CPDictionary)dynamicSet
@@ -812,6 +819,9 @@ CPThemeStateKeyWindow           = CPThemeState("keyWindow");
 CPThemeStateControlSizeRegular  = CPThemeState("controlSizeRegular");
 CPThemeStateControlSizeSmall    = CPThemeState("controlSizeSmall");
 CPThemeStateControlSizeMini     = CPThemeState("controlSizeMini");
+CPThemeStateWindowsPlatform     = CPThemeState("windowsPlatform");
+CPThemeStateAlternateState      = CPThemeState("alternate");
+CPThemeStateComposedControl     = CPThemeState("composed");
 
 CPThemeStateNormalString        = String(CPThemeStateNormal);
 
@@ -1138,6 +1148,20 @@ function CPThemeAttributeDecode(aCoder, attribute)
 
     return attribute;
 }
+
+#pragma mark -
+#pragma mark CSS Theming
+
+@implementation _CPThemeAttribute (CSSTheming)
+
+- (void)clearCache
+{
+    _cache = { };
+}
+
+@end
+
+
 
 /* TO AUTO CREATE THESE:
 function bit_count(bits)
