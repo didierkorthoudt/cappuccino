@@ -44,6 +44,7 @@
 @class CPClipView
 @class CPScrollView
 @class CALayer
+@class CPSplitView;
 
 @global appkit_tag_dom_elements
 
@@ -232,7 +233,7 @@ var CPViewHighDPIDrawingEnabled = YES;
     JSObject            _ephemeralSubviews;
 
     JSObject            _ephemeralSubviewsForNames;
-    CPSet               _ephereralSubviews;
+    CPSet               _ephereralSubviews;             // FIXME: retirer ?
 
     // Key View Support
     CPView              _nextKeyView;
@@ -333,8 +334,14 @@ var CPViewHighDPIDrawingEnabled = YES;
 {
     return @{
              @"css-based": NO,
-             @"dynamic-set": [CPNull null],
-             @"nib2cib-adjustment-frame": CGRectMakeZero()
+             @"nib2cib-adjustment-frame": [CPNull null],
+             @"direct-nib2cib-adjustment": NO,
+             @"dynamic-set": [CPNull null]//,
+//             @"system-font-face": [CPNull null],
+//             @"system-font-style": [CPNull null],
+//             @"system-font-size-regular": [CPNull null],
+//             @"system-font-size-small": [CPNull null],
+//             @"system-font-size-mini": [CPNull null]
              };
 }
 
@@ -1172,11 +1179,8 @@ var CPViewHighDPIDrawingEnabled = YES;
     size.width = aSize.width;
     size.height = aSize.height;
 
-    if (YES)
-    {
-        _bounds.size.width = aSize.width * 1 / _scaleSize.width;
-        _bounds.size.height = aSize.height * 1 / _scaleSize.height;
-    }
+    _bounds.size.width = aSize.width * 1 / _scaleSize.width;
+    _bounds.size.height = aSize.height * 1 / _scaleSize.height;
 
     if (_layer)
         [_layer _owningViewBoundsChanged];
@@ -1995,7 +1999,7 @@ var CPViewHighDPIDrawingEnabled = YES;
 
 #if PLATFORM(DOM)
     if (_backgroundType === BackgroundCSSStyling)
-        [_backgroundColor restorePreviousCSSState:@ref(_cssStylePreviousState) forDOMElement:_DOMElement];
+        [CPColor restorePreviousCSSState:@ref(_cssStylePreviousState) forDOMElement:_DOMElement];
 
     var patternImage = [_backgroundColor patternImage],
         colorExists = _backgroundColor && ([_backgroundColor patternImage] || [_backgroundColor alphaComponent] > 0.0),
@@ -3494,6 +3498,17 @@ setBoundsOrigin:
     return (_ephemeralSubviewsForNames[aViewName] || nil);
 }
 
+- (void)removeEphemeralSubviewNamed:(CPString)aViewName
+{
+    if (_ephemeralSubviewsForNames[aViewName])
+    {
+        [_ephemeralSubviewsForNames[aViewName] removeFromSuperview];
+
+        [_ephemeralSubviews removeObject:_ephemeralSubviewsForNames[aViewName]];
+        delete _ephemeralSubviewsForNames[aViewName];
+    }
+}
+
 @end
 
 @implementation CPView (CSSTheming)
@@ -3505,10 +3520,17 @@ setBoundsOrigin:
 #endif
 }
 
+- (BOOL)isCSSBased
+{
+    return [[CPTheme defaultTheme] valueForAttributeWithName:@"css-based" forClass:CPView];
+}
+
 @end
 
 
 @implementation CPView (Appearance)
+
+// FIXME: Try to optimize as each time a view is layouted, _recomputeAppearance is called (so calling 4 times (un)setThemeState) !
 
 /*! Returns the receiver's appearance if any, or ask the superview and returns it.
 */
@@ -3768,15 +3790,25 @@ var CPViewAutoresizingMaskKey       = @"CPViewAutoresizingMask",
     // Also decode these "early".
     _frame = [aCoder decodeRectForKey:CPViewFrameKey];
     _bounds = [aCoder decodeRectForKey:CPViewBoundsKey];
+    _scaleSize = [aCoder containsValueForKey:CPViewScaleKey] ? [aCoder decodeSizeForKey:CPViewScaleKey] : CGSizeMake(1.0, 1.0);
+    _hierarchyScaleSize = [aCoder containsValueForKey:CPViewSizeScaleKey] ? [aCoder decodeSizeForKey:CPViewSizeScaleKey] : CGSizeMake(1.0, 1.0);
+    _isScaled = [aCoder containsValueForKey:CPViewIsScaledKey] ? [aCoder decodeBoolForKey:CPViewIsScaledKey] : NO;
+    _subviews = @[];
+
+    // FIXME: trying to fix "not ready" views
+    _trackingAreas = [aCoder decodeObjectForKey:CPViewTrackingAreasKey] || @[];
+
+    [self _decodeThemeObjectsWithCoder:aCoder];
+    [self setAppearance:[aCoder decodeObjectForKey:CPViewAppearanceKey]];
 
     self = [super initWithCoder:aCoder];
 
     if (self)
     {
-        _trackingAreas = [aCoder decodeObjectForKey:CPViewTrackingAreasKey];
-
-        if (!_trackingAreas)
-            _trackingAreas = [];
+//        _trackingAreas = [aCoder decodeObjectForKey:CPViewTrackingAreasKey]; // FIXME: inutile ?
+//
+//        if (!_trackingAreas)
+//            _trackingAreas = [];
 
         // We have to manually check because it may be 0, so we can't use ||
         _tag = [aCoder containsValueForKey:CPViewTagKey] ? [aCoder decodeIntForKey:CPViewTagKey] : -1;
@@ -3786,7 +3818,7 @@ var CPViewAutoresizingMaskKey       = @"CPViewAutoresizingMask",
         _superview = [aCoder decodeObjectForKey:CPViewSuperviewKey];
         // We have to manually add the subviews so that they will receive
         // viewWillMoveToSuperview: and viewDidMoveToSuperview:
-        _subviews = [];
+//        _subviews = [];
 
         var subviews = [aCoder decodeObjectForKey:CPViewSubviewsKey] || [];
 
@@ -3815,10 +3847,10 @@ var CPViewAutoresizingMaskKey       = @"CPViewAutoresizingMask",
         if (_toolTip)
             [self _installToolTipEventHandlers];
 
-        _scaleSize = [aCoder containsValueForKey:CPViewScaleKey] ? [aCoder decodeSizeForKey:CPViewScaleKey] : CGSizeMake(1.0, 1.0);
-        _hierarchyScaleSize = [aCoder containsValueForKey:CPViewSizeScaleKey] ? [aCoder decodeSizeForKey:CPViewSizeScaleKey] : CGSizeMake(1.0, 1.0);
-        _isScaled = [aCoder containsValueForKey:CPViewIsScaledKey] ? [aCoder decodeBoolForKey:CPViewIsScaledKey] : NO;
-
+//        _scaleSize = [aCoder containsValueForKey:CPViewScaleKey] ? [aCoder decodeSizeForKey:CPViewScaleKey] : CGSizeMake(1.0, 1.0);
+//        _hierarchyScaleSize = [aCoder containsValueForKey:CPViewSizeScaleKey] ? [aCoder decodeSizeForKey:CPViewSizeScaleKey] : CGSizeMake(1.0, 1.0);
+//        _isScaled = [aCoder containsValueForKey:CPViewIsScaledKey] ? [aCoder decodeBoolForKey:CPViewIsScaledKey] : NO;
+//
         // DOM SETUP
 #if PLATFORM(DOM)
         _cssStylePreviousState = @[];
@@ -3849,12 +3881,13 @@ var CPViewAutoresizingMaskKey       = @"CPViewAutoresizingMask",
 
         [self setBackgroundColor:[aCoder decodeObjectForKey:CPViewBackgroundColorKey]];
         [self _setupViewFlags];
-        [self _decodeThemeObjectsWithCoder:aCoder];
+//        [self _decodeThemeObjectsWithCoder:aCoder];  // FIXME: inutile ?
 
         [self setAppearance:[aCoder decodeObjectForKey:CPViewAppearanceKey]];
         // Set the current appearance to something that can't be the correct one so it will recalculate it at the first layout.
         _currentAppearance = _frame;
 
+        [self updateTrackingAreas];
         [self setNeedsDisplay:YES];
         [self setNeedsLayout];
     }
