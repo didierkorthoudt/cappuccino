@@ -118,9 +118,35 @@ var _CPCibCustomViewClassNameKey = @"_CPCibCustomViewClassNameKey";
         [view setAlphaValue:[self alphaValue]];
         [view setIdentifier:[self identifier]];
 
+        // FIXME: Trying to fix not ready view bug (or running condition)
+        // _appearance
+        // _trackingAreas
+        // _themeState
+        // _theme
+        // _themeClass
+        // _themeAttributes
+        CPLog.trace("_cibInstantiate self="+self+" view="+view+" _tA="+self._trackingAreas+" #:"+[self._trackingAreas count]);
+
+        view._appearance    = self._appearance;
+//        view._trackingAreas = self._trackingAreas;
+        view._theme         = self._theme;
+
+        if (view._themeState == CPThemeStateNormal)
+            view._themeState = self._themeState;
+
+        view._themeAttributes = self._themeAttributes;
+        view._themeClass      = [theClass themeClass];
+
+        [view _loadThemeAttributes];
+
+        // FIXME: here
+        CPLog.trace("CIBINSTANTIATE:"+self+" view="+view+" _super="+_superview+" #sub="+[[_superview subviews] count]);
         [_superview replaceSubview:self with:view];
 
-        [view setBackgroundColor:[self backgroundColor]];
+        var backgroundColor = [self backgroundColor];
+
+        if (backgroundColor)
+            [view setBackgroundColor:backgroundColor];
     }
 
     return view;
