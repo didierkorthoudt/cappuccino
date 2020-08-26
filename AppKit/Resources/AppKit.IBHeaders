@@ -1,0 +1,12 @@
+//
+//  AppKit.h
+//  Created by Didier Korthoudt on 19/07/19.
+//
+// This header file will be added by XcodeCapp to the Xcode project file (under AppKit.h).
+// It contains specific outlets and actions unknown from Cocoa but used by Cappuccino
+
+@interface CPButtonBar : NSView
+
+@property (assign) IBOutlet id delegate;
+
+@end
