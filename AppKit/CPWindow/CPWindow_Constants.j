@@ -200,3 +200,9 @@ CPPanelWindowShadowStyle    = 2;
 CPCustomWindowShadowStyle   = 3;
 
 CPWindowConstrainToScreen = YES;
+
+//@typedef CPWindowOSBehavior
+//CPWindowLegacyOSBehavior = 1;
+//CPWindowFollowOSBehavior = 2;
+//
+//CPWindowSelectedOSBehavior = CPWindowLegacyOSBehavior;
