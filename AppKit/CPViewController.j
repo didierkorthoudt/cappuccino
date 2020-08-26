@@ -132,6 +132,8 @@ var CPViewControllerCachedCibs;
 
         _isLoading = NO;
         _isLazy = NO;
+
+        [self _extensionInit];
     }
 
     return self;
@@ -405,13 +407,13 @@ var CPViewControllerCachedCibs;
     [self _registerOrUnregister:YES notificationsForView:aView];
 
     if (willChangeIsViewLoaded)
-        [self willChangeValueForKey:"isViewLoaded"];
+        [self willChangeValueForKey:@"isViewLoaded"];
 
     _view = aView;
     _isViewLoaded = aView != nil;
 
     if (willChangeIsViewLoaded)
-        [self didChangeValueForKey:"isViewLoaded"];
+        [self didChangeValueForKey:@"isViewLoaded"];
 }
 
 - (BOOL)automaticallyNotifiesObserversOfIsViewLoaded
@@ -445,6 +447,256 @@ var CPViewControllerCachedCibs;
 
 @end
 
+#pragma mark -
+
+/*!
+    CPViewControllerTransitionOptions
+    Animation options for view transitions in a view controller.
+
+    The up and down slide animation options are disjoint and you cannot combine them.
+    Likewise, the left and right slide animation options are disjoint and you cannot combine them.
+    User interaction with transitioning views is prevented for all animation options except the CPViewControllerTransitionAllowUserInteraction option.
+ */
+
+@typedef CPViewControllerTransitionOptions
+/*!
+    CPViewControllerTransitionNone:
+    A transition with no animation (the default).
+    Specifying another animation option from this enumeration overrides this option.
+ */
+CPViewControllerTransitionNone = 0x0; 
+/*!
+    CPViewControllerTransitionCrossfade:
+    A transition animation that fades the new view in and simultaneously fades the old view out.
+    You can combine this animation option with any of the “slide” options in this enumeration.
+ */
+CPViewControllerTransitionCrossfade = 0x1;
+/*!
+    CPViewControllerTransitionSlideUp:
+    A transition animation that slides the old view up while the new view comes into view from the bottom.
+    In other words, both views slide up.
+ */
+CPViewControllerTransitionSlideUp = 0x10;
+/*!
+    NSViewControllerTransitionSlideDown:
+    A transition animation that slides the old view down while the new view slides into view from the top.
+    In other words, both views slide down.
+ */
+CPViewControllerTransitionSlideDown = 0x20;
+/*!
+    CPViewControllerTransitionSlideLeft:
+    A transition animation that slides the old view to the left while the new view slides into view from the right.
+    In other words, both views slide to the left.
+ */
+CPViewControllerTransitionSlideLeft = 0x40;
+/*!
+    CPViewControllerTransitionSlideRight:
+    A transition animation that slides the old view to the right while the new view slides into view from the left.
+    In other words, both views slide to the right.
+ */
+CPViewControllerTransitionSlideRight = 0x80;
+/*!
+    CPViewControllerTransitionSlideForward:
+    A transition animation that reflects the user interface layout direction (userInterfaceLayoutDirection) in a “forward” manner:
+        For left-to-right user interface layout direction, the CPViewControllerTransitionSlideLeft animation option.
+        For right-to-left user interface layout direction, the CPViewControllerTransitionSlideRight animation option.
+ */
+CPViewControllerTransitionSlideForward = 0x140;
+/*!
+    CPViewControllerTransitionSlideBackward:
+    A transition animation that reflects the user interface layout direction (userInterfaceLayoutDirection) in a “forward” manner:
+        For left-to-right user interface layout direction, the CPViewControllerTransitionSlideRight animation option.
+        For right-to-left user interface layout direction, the CPViewControllerTransitionSlideLeft animation option.
+ */
+CPViewControllerTransitionSlideBackward = 0x180;
+/*!
+    CPViewControllerTransitionAllowUserInteraction:
+    A transition animation that allows user interaction during the transition.
+ */
+CPViewControllerTransitionAllowUserInteraction = 0x1000;
+
+@implementation CPViewController (Extensions)
+{
+    CPMutableArray      _childViewControllers;
+    CPViewController    _parentViewController;
+    CGSize              _preferredContentSize;
+}
+
+#pragma mark -
+#pragma mark Extension of implementation
+
+- (void)_extensionInit
+{
+    _childViewControllers = @[];
+    _parentViewController = nil;
+    _preferredContentSize = CGSizeMakeZero();
+}
+
+#pragma mark -
+#pragma mark Managing View Layout
+
+/*!
+    The desired size of the view controller’s view, in screen units.
+ */
+- (CGSize)preferredContentSize
+{
+    return _preferredContentSize;
+}
+
+/*!
+    Set this property to express the desired size for a view controller’s view.
+    A parent view controller can consult the value of this property when performing layout.
+ */
+- (void)setPreferredContentSize:(CGSize)aSize
+{
+    if (CGSizeEqualToSize(_preferredContentSize, aSize))
+        return;
+
+    _preferredContentSize = CGSizeMakeCopy(aSize);
+}
+
+/*!
+    Called during Auto Layout constraint updating to enable the view controller to mediate the process.
+
+    This method gets called, for example, when the user interacts with a view in a way that causes the layout to change. When called, the default implementation of this method in turn calls the updateConstraints method on the view controller’s view.
+    You can override this method to update custom view constraints, as an alternative to subclassing the view controller’s view and overriding its updateConstraints method.
+    If you override this method, you must call this method on super at some point in your implementation or call the updateConstraints method on the view controller’s view.
+ */
+- (void)updateViewConstraints
+{
+    var view = [self view];
+
+    if ([view respondsToSelector:@selector(updateConstraints)])
+        [view updateConstraints];
+}
+
+/*!
+    Called just before the layout method of the view controller's view is called.
+
+    You can override this method to perform tasks to precede the layout of the view controller’s view, such as adjusting Auto Layout constraints. If you override this method, call this method on super at some point in your implementation in case a superclass also overrides this method.
+
+    The default implementation of this method does nothing.
+ */
+- (void)viewWillLayout
+{
+
+}
+
+/*!
+    Called immediately after the layout method of the view controller's view is called.
+
+    You can override this method to perform tasks to follow the completion of layout of the view controller’s view. If you override this method, call this method on super at some point in your implementation in case a superclass also overrides this method.
+
+    The default implementation of this method does nothing.
+ */
+- (void)viewDidLayout
+{
+
+}
+
+#pragma mark -
+#pragma mark Managing Child View Controllers in a Custom Container
+
+/*!
+    A convenience method for adding a child view controller at the end of the childViewControllers array.
+    @param childViewController The view controller to be added to the end of the childViewControllers array.
+ */
+- (void)addChildViewController:(CPViewController)childViewController
+{
+    [self insertChildViewController:childViewController atIndex:[_childViewControllers count]];
+}
+
+/*!
+    An array of view controllers that are hierarchical children of the view controller.
+ */
+- (CPArray)childViewControllers
+{
+    return [_childViewControllers copy];
+}
+
+/*!
+    Performs a transition between two sibling child view controllers of the view controller.
+    @param fromViewController A child view controller whose view is visible in the view controller’s view hierarchy. The view of this view controller must have a superview, or else this method raises an exception.
+    @param toViewController A child view controller whose view is not in the view controller’s view hierarchy.
+    @param options A bitmask of options that specify how you want to perform the transition animation. For the options, see the CPViewControllerTransitionOptions enumeration.
+    @param completion A block called immediately after the transition animation completes.
+
+    Use this method to transition between sibling child view controllers owned by a parent view controller (which is the receiver of this method).
+    This method adds the view in the toViewController view controller to the superview of the view in the fromViewController view controller. Likewise, this method removes the fromViewController view from the parent view controller’s view hierarchy at the appropriate time. It is important to allow this method to add and remove these views.
+    Note
+        The receiver of this method must be the parent view controller of the fromViewController and toViewController view controllers, or else this method raises an exception.
+    To create a parent/child relationship between view controllers, use the addChildViewController: method or the insertChildViewController:atIndex: method.
+ */
+- (void)transitionFromViewController:(CPViewController)fromViewController
+                    toViewController:(CPViewController)toViewController
+                             options:(CPViewControllerTransitionOptions)options
+                   completionHandler:(Function)completion
+{
+
+}
+
+/*!
+    Inserts a specified child view controller into the childViewControllers array at a specified position.
+    @param childViewController The child view controller to add to the childViewControllers array.
+    @param index The index in the childViewControllers array at which to insert the child view controller. This value must not be greater than the count of elements in the array.
+
+    You should instead use the addChildViewController: method unless you want to perform work on child view controllers as you add them. In that case, override this method to perform that work.
+    If a child view controller has a different parent when you call this method, the child is first be removed from its existing parent by calling the child’s removeFromParentViewController method.
+ */
+- (void)insertChildViewController:(CPViewController)childViewController atIndex:(CPInteger)index
+{
+
+}
+
+/*!
+    Removes a specified child controller from the view controller.
+    @param index The index in the childViewControllers array for the child view controller you want to remove.
+
+    Override this method if you want to perform work during the removal of a child view controller. If you do override this method, in your implementation call this method on super.
+    If you just want to remove a child view controller, instead use use the removeFromParentViewController method.
+ */
+- (void)removeChildViewControllerAtIndex:(CPInteger)index
+{
+
+}
+
+/*!
+    Removes the called view controller from its parent view controller.
+
+    Use this method to remove a child view controller from its parent view controller, unless you want to perform work during the removal. In that case, instead override the removeChildViewControllerAtIndex: method to perform that work and call that method.
+    This is a convenience method that calls the removeChildViewControllerAtIndex: method, automatically supplying the appropriate index value as an argument.
+ */
+- (void)removeFromParentViewController
+{
+
+}
+
+/*!
+    Called when there is a change in value of the preferredContentSize property of a child view controller or a presented view controller.
+    @param viewController The view controller whose preferredContentSize property value changed.
+
+    Override this method if you want to adjust layout when a child view controller or presented view controller changes its preferred content size.
+ */
+- (void)preferredContentSizeDidChangeForViewController:(CPViewController)viewController
+{
+
+}
+
+// transitionFromViewController
+// insertChildViewController
+// removeChildViewControllerAtIndex
+// removeFromParentViewController
+// preferredContentSizeDidChangeForViewController
+
+#pragma mark -
+#pragma mark Presenting Another View Controller's Content
+
+#pragma mark -
+#pragma mark Getting Related View Controllers
+
+@end
+
+#pragma mark -
 
 var CPViewControllerViewKey     = @"CPViewControllerViewKey",
     CPViewControllerTitleKey    = @"CPViewControllerTitleKey",
