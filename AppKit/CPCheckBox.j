@@ -94,22 +94,23 @@ CPCheckBoxImageOffset = 4.0;
     [self takeStateFromKeyPath:aKeyPath ofObjects:objects];
 }
 
-- (CPImage)image
-{
-    return [self currentValueForThemeAttribute:@"image"];
-}
-
-- (CPImage)alternateImage
-{
-    return [self currentValueForThemeAttribute:@"image"];
-}
-
-- (BOOL)startTrackingAt:(CGPoint)aPoint
-{
-    var startedTracking = [super startTrackingAt:aPoint];
-    [self highlight:YES];
-    return startedTracking;
-}
+// FIXME: here
+//- (CPImage)image
+//{
+//    return [self currentValueForThemeAttribute:@"image"];
+//}
+//
+//- (CPImage)alternateImage
+//{
+//    return [self currentValueForThemeAttribute:@"image"];
+//}
+//
+//- (BOOL)startTrackingAt:(CGPoint)aPoint
+//{
+//    var startedTracking = [super startTrackingAt:aPoint];
+//    [self highlight:YES];
+//    return startedTracking;
+//}
 
 
 #pragma mark -
@@ -133,6 +134,53 @@ CPCheckBoxImageOffset = 4.0;
     }
 
     return size;
+}
+
+//- (CPThemeState)_imageVisualState
+//{
+//    var visualState  = [self themeState] || CPThemeStateNormal, // Needed during theme compilation
+//        currentState = [self state];
+//
+//    // Note : Behavior differs from CPButton as we don't force "not selected" theme state
+//    //        when button is highglighted and selected
+//
+//    if (_isHighlighted && (_highlightsBy & CPContentsCellMask))
+//        visualState = visualState.and(CPThemeStateHighlighted);
+//
+//    if ((currentState !== CPOffState) && (_showsStateBy & CPContentsCellMask))
+//        visualState = visualState.and((currentState === CPOnState) ? CPThemeStateSelected : CPButtonStateMixed);
+//
+//    return visualState;
+//}
+
+- (CPThemeState)_contentVisualState
+{
+    // Note : Behavior differs from CPButton as title doesn't follow the highlightsBy content flag
+
+    var visualState  = [self themeState] || CPThemeStateNormal, // Needed during theme compilation
+        currentState = [self state];
+
+    if ((currentState !== CPOffState) && (_showsStateBy & CPContentsCellMask))
+        visualState = visualState.and((currentState === CPOnState) ? CPThemeStateSelected : CPButtonStateMixed);
+
+    return visualState;
+}
+
+- (CPThemeState)_imageVisualState
+{
+    // Note : Behavior differs from CPButton as we don't force "not selected" theme state
+    //        when button is highglighted and selected
+
+    var visualState  = [self themeState] || CPThemeStateNormal, // Needed during theme compilation
+        currentState = [self state];
+
+    if (_isHighlighted && (_highlightsBy & CPContentsCellMask))
+        visualState = visualState.and(CPThemeStateHighlighted);
+
+    if ((currentState !== CPOffState) && (_showsStateBy & CPContentsCellMask))
+        visualState = visualState.and((currentState === CPOnState) ? CPThemeStateSelected : CPButtonStateMixed);
+
+    return visualState;
 }
 
 @end
