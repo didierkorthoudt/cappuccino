@@ -127,7 +127,7 @@ var CPViewThemeClassKey             = @"CPViewThemeClassKey",
 
     _themeState = _themeState.without(aState);
 
-    if (oldThemeState === _themeState)
+    if (oldThemeState === _themeState) // FIXME: pourquoi pas return (oldThemeState !== _themeState)
         return NO;
 
     return YES;
@@ -288,7 +288,7 @@ var NULL_THEME = {};
 
     if (_themeAttributes)
     {
-        var theme = [self theme];
+        var theme = [self theme]; // FIXME: inutile ?
 
         for (var attributeName in _themeAttributes)
         {
@@ -298,6 +298,22 @@ var NULL_THEME = {};
     }
 
     return dictionary;
+}
+
+- (void)_addThemeAttributeDictionary:(CPDictionary)themeAttributeDictionary
+{
+    if (!themeAttributeDictionary)
+        return;
+
+    var keys = [themeAttributeDictionary allKeys];
+
+    for (var i = 0, count = [keys count], key, value; i < count; i++)
+    {
+        key = keys[i];
+        value = [themeAttributeDictionary objectForKey:key];
+
+        _themeAttributes[key] = value;
+    }
 }
 
 - (void)setValue:(id)aValue forThemeAttribute:(CPString)aName inState:(ThemeState)aState
