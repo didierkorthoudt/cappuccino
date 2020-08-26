@@ -44,6 +44,9 @@
 
 - (void)awakeFromNib
 {
+    // First, let CPView do its magic
+//    [super awakeFromNib];
+
     if ([_view superview])
         [_view removeFromSuperview];
 }
