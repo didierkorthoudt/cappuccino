@@ -229,6 +229,7 @@ CPToolbarPrintItemIdentifier            = @"CPToolbarPrintItem";
 */
 - (void)setTarget:(id)aTarget
 {
+    CPLog.trace("setTarget:"+aTarget+" for:"+[self label]);
     if (!_view)
         _target = aTarget;
 
@@ -241,6 +242,7 @@ CPToolbarPrintItemIdentifier            = @"CPToolbarPrintItem";
 */
 - (SEL)action
 {
+    CPLog.warn("action for:"+[self label]+"="+_action+" view="+_view+" responds="+[_view respondsToSelector:@selector(action)]+" view action="+([_view respondsToSelector:@selector(action)] ? [_view action] : nil));
     if (_view)
         return [_view respondsToSelector:@selector(action)] ? [_view action] : nil;
 
@@ -253,11 +255,13 @@ CPToolbarPrintItemIdentifier            = @"CPToolbarPrintItem";
 */
 - (void)setAction:(SEL)anAction
 {
+    CPLog.trace("setAction:"+anAction+" for:"+[self label]+" view="+_view+" responds="+[_view respondsToSelector:@selector(setAction:)]);
     if (!_view)
         _action = anAction;
 
     else if ([_view respondsToSelector:@selector(setAction:)])
         [_view setAction:anAction];
+    CPLog.trace("setAction:"+anAction+" for:"+[self label]+" view="+_view+" responds="+[_view respondsToSelector:@selector(setAction:)]+" result="+[self action]);
 }
 
 /*!
@@ -277,6 +281,7 @@ CPToolbarPrintItemIdentifier            = @"CPToolbarPrintItem";
 */
 - (void)setEnabled:(BOOL)shouldBeEnabled
 {
+    CPLog.trace("--- setEnabled:"+shouldBeEnabled+" for:"+[self label]);
     if (_isEnabled === shouldBeEnabled)
         return;
 
@@ -457,6 +462,7 @@ CPToolbarItemVisibilityPriorityUser
 {
     var action = [self action],
         target = [self target];
+    CPLog.error("VALIDATE:"+[self label]+" action="+action+" target="+target+" responds="+[target respondsToSelector:@selector(validateToolbarItem:)]+" t2="+[CPApp targetForAction:action to:target from:self]);
 
     // View items do not do any target-action analysis.
     if (_view)
